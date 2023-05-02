@@ -89,7 +89,7 @@ namespace sequence_maker.ViewModels
         }
         private void FindTargetDirCmd()
         {
-            
+
             using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
             {
                 if (!string.IsNullOrEmpty(SourceDir))
@@ -113,7 +113,7 @@ namespace sequence_maker.ViewModels
 
         private async void CopyCmd()
         {
-            if(string.IsNullOrEmpty(SourceDir) || string.IsNullOrEmpty(TargetDir))
+            if (string.IsNullOrEmpty(SourceDir) || string.IsNullOrEmpty(TargetDir))
             {
                 return;
             }
@@ -128,7 +128,8 @@ namespace sequence_maker.ViewModels
                 return;
             }*/
 
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 long bufferSize = 65536;
                 byte[] buf = new byte[bufferSize];
 
@@ -139,57 +140,59 @@ namespace sequence_maker.ViewModels
                 // 복사할 파일 용량 * Count = 복사할 전체 용량
                 long totalSize = file.Length * CountNumber;
 
-            // countnumber 자릿수
-            int CountLength = (int)(Math.Log10(CountNumber) + 1);
+                // countnumber 자릿수
+                int CountLength = (int)(Math.Log10(CountNumber) + 1);
 
-            string OnlyFileName = Path.GetFileNameWithoutExtension(TargetDir);
-            string OnlyExtention = Path.GetExtension(TargetDir);
+                string OnlyFileName = Path.GetFileNameWithoutExtension(TargetDir);
+                string OnlyExtention = Path.GetExtension(TargetDir);
 
-            // i 번째 파일 전체 용량
-            long iTotalSize = file.Length;
-            string tempTargetDir = Path.GetDirectoryName(TargetDir);
+                // i 번째 파일 전체 용량
+                long iTotalSize = file.Length;
+                string tempTargetDir = Path.GetDirectoryName(TargetDir);
 
-            try
-            {
-                for (int i = 1; i < CountNumber + 1; i++)
+                try
                 {
-                    // countnumber로 파일명 재정의
-                    string TargetFileName = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i) + OnlyExtention;
-                    TargetDir = Path.Combine(tempTargetDir, TargetFileName);
-
-                    strIn = new FileStream(SourceDir, FileMode.Open);
-                    strOut = new FileStream(TargetDir, FileMode.Create);
-
-                    // i 번째 copy
-                    long iSize = 0; // i 번째 파일 복사 완료된 용량
-
-                    while (iSize < iTotalSize)
+                    for (int i = 1; i < CountNumber + 1; i++)
                     {
-                        // 복사
-                        int len = strIn.Read(buf, 0, buf.Length);
-                        strOut.Write(buf, 0, len);
+                        // countnumber로 파일명 재정의
+                        string TargetFileName = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i) + OnlyExtention;
+                        TargetDir = Path.Combine(tempTargetDir, TargetFileName);
 
-                        iSize += len;
+                        strIn = new FileStream(SourceDir, FileMode.Open);
+                        strOut = new FileStream(TargetDir, FileMode.Create);
 
-                        // 진행률
-                        currentSize += len;
-                        TotalProgress = (currentSize * 100) / totalSize;
+                        // i 번째 copy
+                        long iSize = 0; // i 번째 파일 복사 완료된 용량
+
+                        while (iSize < iTotalSize)
+                        {
+                            // 복사
+                            int len = strIn.Read(buf, 0, buf.Length);
+                            strOut.Write(buf, 0, len);
+
+                            iSize += len;
+
+                            // 진행률
+                            currentSize += len;
+                            TotalProgress = (currentSize * 100) / totalSize;
+                        }
+
+                        // stream close
+                        strOut.Flush();
+                        strIn.Close();
+                        strOut.Close();
+                        _logManager.Logger.Info($"Copy success {i}times");
                     }
-
-                    // stream close
-                    strOut.Flush();
-                    strIn.Close();
-                    strOut.Close();
-                    _logManager.Logger.Info($"Copy success {i}times");
                 }
-            }
-            catch(Exception ex)
-            {
-                _logManager.Logger.Info($"Copy failed, Error : {ex.Message} ");
-                return;
-            }
-            _logManager.Logger.Info($"Copy success");
-        }
+                catch (Exception ex)
+                {
+                    _logManager.Logger.Info($"Copy failed, Error : {ex.Message} ");
+                    return;
+                }
+                _logManager.Logger.Info($"Copy success");
+
+            });
         #endregion
+        }
     }
 }
