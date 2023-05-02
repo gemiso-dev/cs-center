@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Prism.Commands;
 using sequence_maker.Services;
 using System;
+using System.Threading.Tasks;
 
 namespace sequence_maker.ViewModels
 {
@@ -109,7 +110,8 @@ namespace sequence_maker.ViewModels
                 }
             }
         }
-        private void CopyCmd()
+
+        private async void CopyCmd()
         {
             if(string.IsNullOrEmpty(SourceDir) || string.IsNullOrEmpty(TargetDir))
             {
@@ -126,53 +128,56 @@ namespace sequence_maker.ViewModels
                 return;
             }
 
-            long bufferSize = 65536;
-            byte[] buf = new byte[bufferSize];
+            await Task.Run(() => {
+                long bufferSize = 65536;
+                byte[] buf = new byte[bufferSize];
 
-            FileInfo file = new FileInfo(SourceDir);
+                FileInfo file = new FileInfo(SourceDir);
 
-            // 복사 완료된 파일 용량
-            long currentSize = 0;
-            // 복사할 파일 용량 * Count = 복사할 전체 용량
-            long totalSize = file.Length * CountNumber;
+                // 복사 완료된 파일 용량
+                long currentSize = 0;
+                // 복사할 파일 용량 * Count = 복사할 전체 용량
+                long totalSize = file.Length * CountNumber;
 
-            // countnumber 자릿수
-            int CountLength = (int)(Math.Log10(CountNumber) + 1);
-            string OnlyFileName = Path.GetFileNameWithoutExtension(TargetDir);
-            string OnlyExtention = Path.GetExtension(TargetDir);
+                // countnumber 자릿수
+                int CountLength = (int)(Math.Log10(CountNumber) + 1);
+                string OnlyFileName = Path.GetFileNameWithoutExtension(TargetDir);
+                string OnlyExtention = Path.GetExtension(TargetDir);
 
-            // i 번째 파일 전체 용량
-            long iTotalSize = file.Length;
-            for (int i = 1; i < CountNumber+1; i++)
-            {
-                
-                string OnlyTargetFileName = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i) + OnlyExtention;
-                string TargetFileName = Path.Combine(targetOnlyPath, OnlyTargetFileName);
-
-                strIn = new FileStream(SourceDir, FileMode.Open);
-                strOut = new FileStream(TargetFileName, FileMode.Create);
-
-                // i 번째 copy
-                long iSize = 0; // i 번째 파일 복사 완료된 용량
-
-                while (iSize < iTotalSize)
+                // i 번째 파일 전체 용량
+                long iTotalSize = file.Length;
+                for (int i = 1; i < CountNumber + 1; i++)
                 {
-                    // 복사
-                    int len = strIn.Read(buf, 0, buf.Length);
-                    strOut.Write(buf, 0, len);
 
-                    iSize += len;
+                    string OnlyTargetFileName = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i) + OnlyExtention;
+                    string TargetFileName = Path.Combine(targetOnlyPath, OnlyTargetFileName);
 
-                    // 진행률
-                    currentSize += len;
-                    TotalProgress = (currentSize * 100) / totalSize;
+                    strIn = new FileStream(SourceDir, FileMode.Open);
+                    strOut = new FileStream(TargetFileName, FileMode.Create);
+
+                    // i 번째 copy
+                    long iSize = 0; // i 번째 파일 복사 완료된 용량
+
+                    while (iSize < iTotalSize)
+                    {
+                        // 복사
+                        int len = strIn.Read(buf, 0, buf.Length);
+                        strOut.Write(buf, 0, len);
+
+                        iSize += len;
+
+                        // 진행률
+                        currentSize += len;
+                        TotalProgress = (currentSize * 100) / totalSize;
+                    }
+
+                    // stream close
+                    strOut.Flush();
+                    strIn.Close();
+                    strOut.Close();
                 }
-
-                // stream close
-                strOut.Flush();
-                strIn.Close();
-                strOut.Close();
-            }
+            });
+            
         }
         #endregion
     }
