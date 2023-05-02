@@ -13,9 +13,11 @@ namespace sequence_maker.ViewModels
     {
         private FileStream strIn = null;
         private FileStream strOut = null;
-        string TargetName;
-        string targetOnlyPath;
         private readonly ILogManager _logManager;
+
+        #region Variable
+        private string TargetOnlyPath { get; set; }
+        #endregion
 
         #region Bind
         private string _sourceDir;
@@ -80,28 +82,26 @@ namespace sequence_maker.ViewModels
                 {
                     SourceDir = string.Empty;
                 }
-                TargetName = Path.GetFileName(fileDialog.SafeFileName);
+                //TargetName = Path.GetFileName(fileDialog.SafeFileName);
             }
             _logManager.Logger.Info($"Source directory : {SourceDir}");
             TargetDir = string.Empty;
         }
-
         private void FindTargetDirCmd()
         {
             
             using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
             {
-                if (!string.IsNullOrEmpty(TargetName))
+                if (!string.IsNullOrEmpty(SourceDir))
                 {
                     if (folderDialog.ShowDialog() == DialogResult.OK)
                     {
-                        targetOnlyPath = folderDialog.SelectedPath;
+                        TargetDir = Path.Combine(folderDialog.SelectedPath, Path.GetFileName(SourceDir));
                     }
                     else
                     {
-                        targetOnlyPath = string.Empty;
+                        TargetDir = string.Empty;
                     }
-                    TargetDir = Path.Combine(targetOnlyPath, TargetName);
                     _logManager.Logger.Info($"Target directory : {TargetDir}");
                 }
                 else
@@ -118,7 +118,7 @@ namespace sequence_maker.ViewModels
                 return;
             }
 
-            if (!File.Exists(TargetDir))
+            /*if (!File.Exists(TargetDir))
             {
             }
             else
@@ -126,7 +126,7 @@ namespace sequence_maker.ViewModels
                 // 타켓 이름이 이미 존재할 때
                 _logManager.Logger.Info($"{TargetDir} is already exist.");
                 return;
-            }
+            }*/
 
             await Task.Run(() => {
                 long bufferSize = 65536;
@@ -139,21 +139,26 @@ namespace sequence_maker.ViewModels
                 // 복사할 파일 용량 * Count = 복사할 전체 용량
                 long totalSize = file.Length * CountNumber;
 
-                // countnumber 자릿수
-                int CountLength = (int)(Math.Log10(CountNumber) + 1);
-                string OnlyFileName = Path.GetFileNameWithoutExtension(TargetDir);
-                string OnlyExtention = Path.GetExtension(TargetDir);
+            // countnumber 자릿수
+            int CountLength = (int)(Math.Log10(CountNumber) + 1);
 
-                // i 번째 파일 전체 용량
-                long iTotalSize = file.Length;
+            string OnlyFileName = Path.GetFileNameWithoutExtension(TargetDir);
+            string OnlyExtention = Path.GetExtension(TargetDir);
+
+            // i 번째 파일 전체 용량
+            long iTotalSize = file.Length;
+            string tempTargetDir = Path.GetDirectoryName(TargetDir);
+
+            try
+            {
                 for (int i = 1; i < CountNumber + 1; i++)
                 {
-
-                    string OnlyTargetFileName = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i) + OnlyExtention;
-                    string TargetFileName = Path.Combine(targetOnlyPath, OnlyTargetFileName);
+                    // countnumber로 파일명 재정의
+                    string TargetFileName = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i) + OnlyExtention;
+                    TargetDir = Path.Combine(tempTargetDir, TargetFileName);
 
                     strIn = new FileStream(SourceDir, FileMode.Open);
-                    strOut = new FileStream(TargetFileName, FileMode.Create);
+                    strOut = new FileStream(TargetDir, FileMode.Create);
 
                     // i 번째 copy
                     long iSize = 0; // i 번째 파일 복사 완료된 용량
@@ -175,9 +180,15 @@ namespace sequence_maker.ViewModels
                     strOut.Flush();
                     strIn.Close();
                     strOut.Close();
+                    _logManager.Logger.Info($"Copy success {i}times");
                 }
-            });
-            
+            }
+            catch(Exception ex)
+            {
+                _logManager.Logger.Info($"Copy failed, Error : {ex.Message} ");
+                return;
+            }
+            _logManager.Logger.Info($"Copy success");
         }
         #endregion
     }
