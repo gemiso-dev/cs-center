@@ -1,9 +1,9 @@
-﻿
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
 using System.Windows.Forms;
 using System.IO;
 using System.Windows.Input;
 using Prism.Commands;
+using sequence_maker.Services;
 using System;
 
 namespace sequence_maker.ViewModels
@@ -14,6 +14,7 @@ namespace sequence_maker.ViewModels
         private FileStream strOut = null;
         string TargetName;
         string targetOnlyPath;
+        private readonly ILogManager _logManager;
 
         #region Bind
         private string _sourceDir;
@@ -51,11 +52,15 @@ namespace sequence_maker.ViewModels
         public ICommand CopyCommand { get; set; }
         #endregion
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(ILogManager logManager)
         {
+            _logManager = logManager;
+
             FindSourceDirCommand = new DelegateCommand(FindSourceDirCmd);
             FindTargetDirCommand = new DelegateCommand(FindTargetDirCmd);
             CopyCommand = new DelegateCommand(CopyCmd);
+
+            _logManager.Logger.Info("sequence maker start");
         }
 
         #region Cmd
@@ -76,7 +81,7 @@ namespace sequence_maker.ViewModels
                 }
                 TargetName = Path.GetFileName(fileDialog.SafeFileName);
             }
-            //logManager._loggerManage.Log(LogLevel.Error, ($""));
+            _logManager.Logger.Info($"Source directory : {SourceDir}");
             TargetDir = string.Empty;
         }
 
@@ -96,10 +101,11 @@ namespace sequence_maker.ViewModels
                         targetOnlyPath = string.Empty;
                     }
                     TargetDir = Path.Combine(targetOnlyPath, TargetName);
+                    _logManager.Logger.Info($"Target directory : {TargetDir}");
                 }
                 else
                 {
-                    //logManager._loggerManage.Log(LogLevel.Error, ($""));
+                    _logManager.Logger.Error("Source directory is empty. Find source directory first.");
                 }
             }
         }
@@ -111,6 +117,7 @@ namespace sequence_maker.ViewModels
             else
             {
                 // 타켓 이름이 이미 존재할 때
+                _logManager.Logger.Info($"{TargetDir} is already exist.");
                 return;
             }
 
