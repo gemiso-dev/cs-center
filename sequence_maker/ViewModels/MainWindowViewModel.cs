@@ -133,12 +133,12 @@ namespace sequence_maker.ViewModels
 
             int CountLength = (int)(Math.Log10(CountNumber) + 1);
 
-            
+            string OnlyFileName = Path.GetFileNameWithoutExtension(SourceDir);
 
             for (int i = 1; i < CountNumber+1; i++)
             {
-
-                string OnlyTargetFileName = TargetName + "_" + string.Format("{0:D" + CountLength + "}", i);
+                
+                string OnlyTargetFileName = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i);
                 string TargetFileName = Path.Combine(targetOnlyPath, OnlyTargetFileName);
 
 
