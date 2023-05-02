@@ -30,17 +30,26 @@ namespace sequence_maker.ViewModels
             get { return _targetName; }
             set { SetProperty(ref _targetName, value); }
         }
+
+        private int _copyCount;
+        public int CopyCount
+        {
+            get { return _copyCount; }
+            set { SetProperty(ref _copyCount, value); }
+        }
         #endregion
 
         #region Command
         public ICommand FindSourceDirCommand { get; set; }
         public ICommand FindTargetDirCommand { get; set; }
+        public ICommand CopyCommand { get; set; }
         #endregion
 
         public MainWindowViewModel()
         {
             FindSourceDirCommand = new DelegateCommand(FindSourceDirCmd);
             FindTargetDirCommand = new DelegateCommand(FindTargetDirCmd);
+            CopyCommand = new DelegateCommand(CopyCmd);
         }
 
         #region Cmd
@@ -86,6 +95,10 @@ namespace sequence_maker.ViewModels
                     //logManager._loggerManage.Log(LogLevel.Error, ($""));
                 }
             }
+        }
+        private void CopyCmd()
+        {
+            
         }
         #endregion
     }
