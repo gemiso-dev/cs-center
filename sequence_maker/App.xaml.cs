@@ -1,4 +1,5 @@
 ﻿using Prism.Ioc;
+using sequence_maker.Services;
 using sequence_maker.Views;
 using System.Windows;
 
@@ -16,7 +17,7 @@ namespace sequence_maker
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-
+            containerRegistry.RegisterSingleton<ILogManager, LogManager>();
         }
     }
 }
