@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Windows.Input;
 using Prism.Commands;
+using System;
 
 namespace sequence_maker.ViewModels
 {
@@ -11,6 +12,8 @@ namespace sequence_maker.ViewModels
     {
         private FileStream strIn = null;
         private FileStream strOut = null;
+        string TargetName;
+        string targetOnlyPath;
 
         #region Bind
         private string _sourceDir;
@@ -27,18 +30,11 @@ namespace sequence_maker.ViewModels
             set { SetProperty(ref _targetDir, value); }
         }
 
-        private string _targetName;
-        public string TargetName
+        private int _countNumber;
+        public int CountNumber
         {
-            get { return _targetName; }
-            set { SetProperty(ref _targetName, value); }
-        }
-
-        private int _copyCount;
-        public int CopyCount
-        {
-            get { return _copyCount; }
-            set { SetProperty(ref _copyCount, value); }
+            get { return _countNumber; }
+            set { SetProperty(ref _countNumber, value); }
         }
 
         private long _totalProgress;
@@ -83,9 +79,10 @@ namespace sequence_maker.ViewModels
             //logManager._loggerManage.Log(LogLevel.Error, ($""));
             TargetDir = string.Empty;
         }
+
         private void FindTargetDirCmd()
         {
-            string targetOnlyPath;
+            
             using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
             {
                 if (!string.IsNullOrEmpty(TargetName))
@@ -114,6 +111,7 @@ namespace sequence_maker.ViewModels
             else
             {
                 // 타켓 이름이 이미 존재할 때
+                return;
             }
 
             long bufferSize = 65536;
@@ -124,12 +122,21 @@ namespace sequence_maker.ViewModels
             // 복사 완료된 파일 용량
             long currentSize = 0;
             // 복사할 파일 용량 * Count = 복사할 전체 용량
-            long totalSize = file.Length * CopyCount;
+            long totalSize = file.Length * CountNumber;
 
-            for(int i = 0; i < CopyCount; i++)
+            int CountLength = (int)(Math.Log10(CountNumber) + 1);
+
+            
+
+            for (int i = 1; i < CountNumber+1; i++)
             {
+
+                string OnlyTargetFileName = TargetName + "_" + string.Format("{0:D" + CountLength + "}", i);
+                string TargetFileName = Path.Combine(targetOnlyPath, OnlyTargetFileName);
+
+
                 strIn = new FileStream(SourceDir, FileMode.Open);
-                strOut = new FileStream(TargetDir, FileMode.Create);
+                strOut = new FileStream(TargetFileName, FileMode.Create);
 
                 // i 번째 copy
                 int iSize = 0; // i 번째 파일 복사 완료된 용량
