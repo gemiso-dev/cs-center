@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        Title="Sequence Maker" Height="300" Width="600" >
+        Title="Sequence Maker" Height="300" Width="450" >
+    
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -13,15 +14,15 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="400"/>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="0.5*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
-                <TextBlock Text="Source Path : " FontSize="13" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <TextBlock Text="Source Path : " FontSize="12" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Grid>
             <Grid Grid.Column="1">
-                <TextBox Text="{Binding SourceDir}" Height="20" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                <TextBox Text="{Binding SourceDir}" Height="25" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5"/>
             </Grid>
             <Grid Grid.Column="2">
                 <Button Content="..." FontSize="15" FontWeight="Bold" Background="LightCyan" HorizontalAlignment="Center"
@@ -37,15 +38,15 @@
         </Grid>
         <Grid Grid.Row="1" Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="400"/>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="0.5*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
-                <TextBlock Text="Target Path : " FontSize="13" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <TextBlock Text="Target Path : " FontSize="12" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Grid>
             <Grid Grid.Column="1">
-                <TextBox Text="{Binding TargetDir}" Height="20" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                <TextBox Text="{Binding TargetDir}" Height="25" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5"/>
             </Grid>
             <Grid Grid.Column="2">
                 <Button Content="..." FontSize="15" FontWeight="Bold" Background="LightCyan" HorizontalAlignment="Center"
@@ -61,20 +62,19 @@
         </Grid>
         <Grid Grid.Row="2" Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="150"/>
-                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2.5*"/>
+                <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
-                <TextBlock Text="Count : " FontSize="13" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <TextBlock Text="Count : " FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
             <Grid Grid.Column="1">
-                <TextBox Text="{Binding TargetDir}" Height="20" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                <TextBox Text="{Binding CountNumber}" Height="25" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5"/>
             </Grid>
-            <Grid Grid.Column="4">
-                <Button Content="Start" FontSize="13" FontWeight="Bold" Background="LightCyan" HorizontalAlignment="Center"
-                        Margin="20, 0, 0, 0" Height="30" Width="60" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+            <Grid Grid.Column="2">
+                <Button Content="Start" FontSize="15" Background="LightCyan" HorizontalAlignment="Center"
+                        Margin="5" Height="30" Width="70" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                         Command="{Binding CopyCommand}">
                     <Button.Resources>
                         <Style TargetType="Border">
@@ -83,6 +83,10 @@
                     </Button.Resources>
                 </Button>
             </Grid>
+        </Grid>
+        <Grid Grid.Row="3" Margin="5">
+            <ProgressBar Minimum="0" Maximum="100" Value="{Binding TotalProgress, Mode=OneWay}" Height="30"/>
+            <TextBlock Text="{Binding Path=TotalProgress, StringFormat={}{0:0}%}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Grid>
     </Grid>
 </Window>
