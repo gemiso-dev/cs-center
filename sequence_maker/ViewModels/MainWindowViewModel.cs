@@ -126,7 +126,7 @@ namespace sequence_maker.ViewModels
             }
             if(CountNumber == 0)
             {
-                _logManager.Logger.Error($"Copy failed, Count is Zero.");
+                _logManager.Logger.Error($"Copy failed, CountNumber is Zero.");
                 return;
             }
 
@@ -159,7 +159,7 @@ namespace sequence_maker.ViewModels
 
             await Task.Run(() =>
             {
-                _logManager.Logger.Info($"Copy start ({CountNumber} times)\n(Source directory : {SourceDir}) \n(Target directory : {TargetDir}) ");
+                _logManager.Logger.Info($"Copy start (CountNumber : {CountNumber})\n(Source directory : {SourceDir}) \n(Target directory : {TargetDir}) ");
                 try
                 {
                     for (int i = 1; i < CountNumber + 1; i++)
@@ -176,7 +176,6 @@ namespace sequence_maker.ViewModels
                         // 복사 파일 이름 존재 시 건너 뛰기
                         if (File.Exists(tempTargetDir))
                         {
-
                             FileInfo ExistedFile = new FileInfo(tempTargetDir);
                             long existedFileSize = ExistedFile.Length;
 
@@ -186,14 +185,11 @@ namespace sequence_maker.ViewModels
                             currentSize += existedFileSize;
                             TotalProgress = (currentSize * 100) / totalSize;
 
-
                             continue;
                         }
 
                         strIn = new FileStream(SourceDir, FileMode.Open);
                         strOut = new FileStream(tempTargetDir, FileMode.Create);
-
-                        
 
                         while (iSize < iTotalSize)
                         {
