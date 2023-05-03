@@ -44,8 +44,8 @@ namespace sequence_maker.ViewModels
             set { SetProperty(ref _totalProgress, value); }
         }
 
-        private long _currentFileName;
-        public long CurrentFileName
+        private string _currentFileName;
+        public string CurrentFileName
         {
             get { return _currentFileName; }
             set { SetProperty(ref _currentFileName, value); }
@@ -168,6 +168,7 @@ namespace sequence_maker.ViewModels
                         targetFileRename = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i) + OnlyExtention;
                         tempTargetDir = Path.Combine(TargetDir, targetFileRename);
 
+                        CurrentFileName = targetFileRename;
 
                         // i 번째 copy
                         long iSize = 0; // i 번째 파일 복사 완료된 용량
@@ -176,7 +177,7 @@ namespace sequence_maker.ViewModels
                         if (File.Exists(tempTargetDir))
                         {
 
-                            FileInfo ExistedFile = new FileInfo(TargetDir);
+                            FileInfo ExistedFile = new FileInfo(tempTargetDir);
                             long existedFileSize = ExistedFile.Length;
 
                             // 이미 존재하는 파일의 용량을 읽어 진행률에 표시
