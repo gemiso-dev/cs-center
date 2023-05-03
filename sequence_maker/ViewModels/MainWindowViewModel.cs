@@ -171,7 +171,6 @@ namespace sequence_maker.ViewModels
                         TargetFileRename = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i) + OnlyExtention;
                         TargetDir = Path.Combine(OnlyPath, TargetFileRename);
 
-                        CurrentFileName
 
                         // i 번째 copy
                         long iSize = 0; // i 번째 파일 복사 완료된 용량
@@ -184,7 +183,7 @@ namespace sequence_maker.ViewModels
                             long existedFileSize = ExistedFile.Length;
 
                             // 이미 존재하는 파일의 용량을 읽어 진행률에 표시
-                            iSize += existedFileSize;
+                            //iSize += existedFileSize;
 
                             currentSize += existedFileSize;
                             TotalProgress = (currentSize * 100) / totalSize;

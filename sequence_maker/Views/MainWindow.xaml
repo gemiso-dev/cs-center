@@ -90,7 +90,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
-                <TextBlock Text="{Binding ProgressFileName}" FontSize="8" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding CurrentFileName}" FontSize="8" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Grid>
             <Grid Grid.Row="1">
                 <ProgressBar Minimum="0" Maximum="100" Value="{Binding TotalProgress, Mode=OneWay}" Height="30"/>
