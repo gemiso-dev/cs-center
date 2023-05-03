@@ -13,6 +13,7 @@ namespace sequence_maker.ViewModels
     {
         private FileStream strIn = null;
         private FileStream strOut = null;
+        private FileStream strAlreadyFile = null;
         private readonly ILogManager _logManager;
 
         #region Variable
@@ -158,11 +159,30 @@ namespace sequence_maker.ViewModels
                         string TargetFileName = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i) + OnlyExtention;
                         TargetDir = Path.Combine(tempTargetDir, TargetFileName);
 
+                        // i 번째 copy
+                        long iSize = 0; // i 번째 파일 복사 완료된 용량
+
+                        // 복사 파일 이름 존재 시 건너 뛰기
+                        if (File.Exists(TargetDir))
+                        {
+                            strAlreadyFile = new FileStream(TargetDir, FileMode.Open);
+                            int AlreadyFileSize = strAlreadyFile.Read(buf, 0, buf.Length);
+
+                            // 이미 존재하는 파일의 용량을 읽어 진행률에 표시
+                            iSize += AlreadyFileSize;
+
+                            currentSize += AlreadyFileSize;
+                            TotalProgress = (currentSize * 100) / totalSize;
+
+                            strAlreadyFile.Close();
+
+                            continue;
+                        }
+
                         strIn = new FileStream(SourceDir, FileMode.Open);
                         strOut = new FileStream(TargetDir, FileMode.Create);
 
-                        // i 번째 copy
-                        long iSize = 0; // i 번째 파일 복사 완료된 용량
+                        
 
                         while (iSize < iTotalSize)
                         {
