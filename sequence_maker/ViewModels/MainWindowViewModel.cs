@@ -15,10 +15,6 @@ namespace sequence_maker.ViewModels
         private FileStream strOut = null;
         private readonly ILogManager _logManager = null;
 
-        #region Variable
-        private string TargetFileRename { get; set; }
-        #endregion
-
         #region Bind
         private string _sourceDir;
         public string SourceDir
@@ -104,7 +100,7 @@ namespace sequence_maker.ViewModels
                 {
                     if (folderDialog.ShowDialog() == DialogResult.OK)
                     {
-                        TargetDir = Path.Combine(folderDialog.SelectedPath, Path.GetFileName(SourceDir));
+                        TargetDir = folderDialog.SelectedPath;
                     }
                     else
                     {
@@ -151,11 +147,12 @@ namespace sequence_maker.ViewModels
             int CountLength = (int)(Math.Log10(CountNumber) + 1);
 
             // 파일명, 확장자명, 경로 추출
-            string OnlyFileName = Path.GetFileNameWithoutExtension(TargetDir);
-            string OnlyExtention = Path.GetExtension(TargetDir);
-            string OnlyPath = Path.GetDirectoryName(TargetDir);
+            string OnlyFileName = Path.GetFileNameWithoutExtension(SourceDir);
+            string OnlyExtention = Path.GetExtension(SourceDir);
+            //string OnlyPath = Path.GetDirectoryName(TargetDir);
 
-            string tempTargetDir = TargetDir;
+            string targetFileRename = "";
+            string tempTargetDir = "";
 
             // i 번째 파일 전체 용량
             long iTotalSize = file.Length;
@@ -168,15 +165,15 @@ namespace sequence_maker.ViewModels
                     for (int i = 1; i < CountNumber + 1; i++)
                     {
                         // countnumber로 파일명 재정의
-                        TargetFileRename = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i) + OnlyExtention;
-                        TargetDir = Path.Combine(OnlyPath, TargetFileRename);
+                        targetFileRename = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i) + OnlyExtention;
+                        tempTargetDir = Path.Combine(TargetDir, targetFileRename);
 
 
                         // i 번째 copy
                         long iSize = 0; // i 번째 파일 복사 완료된 용량
 
                         // 복사 파일 이름 존재 시 건너 뛰기
-                        if (File.Exists(TargetDir))
+                        if (File.Exists(tempTargetDir))
                         {
 
                             FileInfo ExistedFile = new FileInfo(TargetDir);
@@ -193,7 +190,7 @@ namespace sequence_maker.ViewModels
                         }
 
                         strIn = new FileStream(SourceDir, FileMode.Open);
-                        strOut = new FileStream(TargetDir, FileMode.Create);
+                        strOut = new FileStream(tempTargetDir, FileMode.Create);
 
                         
 
@@ -222,7 +219,6 @@ namespace sequence_maker.ViewModels
                     _logManager.Logger.Error($"Copy failed, Error : {ex.Message} ");
                     return;
                 }
-                TargetDir = tempTargetDir;
                 _logManager.Logger.Info($"Copy success");
             }
             );
