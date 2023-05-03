@@ -13,7 +13,6 @@ namespace sequence_maker.ViewModels
     {
         private FileStream strIn = null;
         private FileStream strOut = null;
-        private FileStream strExistedFile = null;
         private readonly ILogManager _logManager = null;
 
         #region Variable
@@ -47,6 +46,13 @@ namespace sequence_maker.ViewModels
         {
             get { return _totalProgress; }
             set { SetProperty(ref _totalProgress, value); }
+        }
+
+        private long _currentFileName;
+        public long CurrentFileName
+        {
+            get { return _currentFileName; }
+            set { SetProperty(ref _currentFileName, value); }
         }
         #endregion
 
@@ -122,6 +128,11 @@ namespace sequence_maker.ViewModels
                 _logManager.Logger.Error($"Copy failed, source directory or target directory is empty.");
                 return;
             }
+            if(CountNumber == 0)
+            {
+                _logManager.Logger.Error($"Copy failed, Count is Zero.");
+                return;
+            }
 
             // 버퍼
             long bufferSize = Properties.Settings.Default.CopyBufferSize;
@@ -160,14 +171,17 @@ namespace sequence_maker.ViewModels
                         TargetFileRename = OnlyFileName + "_" + string.Format("{0:D" + CountLength + "}", i) + OnlyExtention;
                         TargetDir = Path.Combine(OnlyPath, TargetFileRename);
 
+                        CurrentFileName
+
                         // i 번째 copy
                         long iSize = 0; // i 번째 파일 복사 완료된 용량
 
                         // 복사 파일 이름 존재 시 건너 뛰기
                         if (File.Exists(TargetDir))
                         {
-                            strExistedFile = new FileStream(TargetDir, FileMode.Open);
-                            int existedFileSize = strExistedFile.Read(buf, 0, buf.Length);
+
+                            FileInfo ExistedFile = new FileInfo(TargetDir);
+                            long existedFileSize = ExistedFile.Length;
 
                             // 이미 존재하는 파일의 용량을 읽어 진행률에 표시
                             iSize += existedFileSize;
@@ -175,7 +189,6 @@ namespace sequence_maker.ViewModels
                             currentSize += existedFileSize;
                             TotalProgress = (currentSize * 100) / totalSize;
 
-                            strExistedFile.Close();
 
                             continue;
                         }

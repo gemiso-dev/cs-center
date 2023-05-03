@@ -85,8 +85,18 @@
             </Grid>
         </Grid>
         <Grid Grid.Row="3" Margin="5">
-            <ProgressBar Minimum="0" Maximum="100" Value="{Binding TotalProgress, Mode=OneWay}" Height="30"/>
-            <TextBlock Text="{Binding Path=TotalProgress, StringFormat={}{0:0}%}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.5*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <TextBlock Text="{Binding ProgressFileName}" FontSize="8" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <ProgressBar Minimum="0" Maximum="100" Value="{Binding TotalProgress, Mode=OneWay}" Height="30"/>
+                <TextBlock Text="{Binding Path=TotalProgress, StringFormat={}{0:0}%}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Grid>
+            
         </Grid>
     </Grid>
 </Window>
