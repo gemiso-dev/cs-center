@@ -13,8 +13,8 @@ namespace sequence_maker.ViewModels
     {
         private FileStream strIn = null;
         private FileStream strOut = null;
-        private FileStream strAlreadyFile = null;
-        private readonly ILogManager _logManager;
+        private FileStream strExistedFile = null;
+        private readonly ILogManager _logManager = null;
 
         #region Variable
         private string TargetFileRename { get; set; }
@@ -166,16 +166,16 @@ namespace sequence_maker.ViewModels
                         // 복사 파일 이름 존재 시 건너 뛰기
                         if (File.Exists(TargetDir))
                         {
-                            strAlreadyFile = new FileStream(TargetDir, FileMode.Open);
-                            int AlreadyFileSize = strAlreadyFile.Read(buf, 0, buf.Length);
+                            strExistedFile = new FileStream(TargetDir, FileMode.Open);
+                            int existedFileSize = strExistedFile.Read(buf, 0, buf.Length);
 
                             // 이미 존재하는 파일의 용량을 읽어 진행률에 표시
-                            iSize += AlreadyFileSize;
+                            iSize += existedFileSize;
 
-                            currentSize += AlreadyFileSize;
+                            currentSize += existedFileSize;
                             TotalProgress = (currentSize * 100) / totalSize;
 
-                            strAlreadyFile.Close();
+                            strExistedFile.Close();
 
                             continue;
                         }
